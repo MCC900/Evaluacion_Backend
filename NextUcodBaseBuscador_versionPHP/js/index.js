@@ -29,6 +29,7 @@ function inicializarSlider(){
   Función que reproduce el video de fondo al hacer scroll, y deteiene la reproducción al detener el scroll
 */
 function playVideoOnScroll(){
+  /*
   var ultimoScroll = 0,
       intervalRewind;
   var video = document.getElementById('vidFondo');
@@ -45,8 +46,40 @@ function playVideoOnScroll(){
     })
     .scrollEnd(()=>{
       video.pause();
-    }, 10)
+    }, 10)*/
 }
 
 inicializarSlider();
 playVideoOnScroll();
+
+$(function(){
+
+  $('#formulario').submit(function(event){
+    event.preventDefault();
+
+    $.ajax({
+      url:"./buscador.php",
+      type:"GET",
+      dataType:"json",
+      data:{
+        busquedaPersonalizada:"true"
+      }
+    }).done(function(data){
+      alert(data.mensaje);
+    });
+  });
+
+  $('#mostrarTodos').on('click', function(event){
+    $.ajax({
+      url:"./buscador.php",
+      type:"GET",
+      dataType:"json",
+      data:{
+        busquedaPersonalizada:"false"
+      }
+    }).done(function(data){
+      alert(data.mensaje);
+    });
+  });
+
+});
