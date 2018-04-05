@@ -29,7 +29,7 @@ function inicializarSlider(){
   Función que reproduce el video de fondo al hacer scroll, y deteiene la reproducción al detener el scroll
 */
 function playVideoOnScroll(){
-  /*
+
   var ultimoScroll = 0,
       intervalRewind;
   var video = document.getElementById('vidFondo');
@@ -46,14 +46,43 @@ function playVideoOnScroll(){
     })
     .scrollEnd(()=>{
       video.pause();
-    }, 10)*/
+    }, 10)
 }
 
-inicializarSlider();
-playVideoOnScroll();
+/*---Esta función envía una petición ajax a listas.php y carga
+un dropdown (select) usando los elementos de la lista devuelta---*/
+
+function cargarDropdown(select, tipoAListar){
+  $.ajax({
+    url:"./listas.php",
+    type:"GET",
+    dataType:"json",
+    data:{
+      tipoAListar:tipoAListar
+    }
+  }).done(function(data){
+    for(var i=0; i < data.listaElementos.length; i++){
+      var elemento = data.listaElementos[i];
+      var opcion = $("<option>");
+      opcion.attr("value", elemento);
+      opcion.html(elemento);
+      select.append(opcion);
+    }
+    select.material_select();
+  })
+}
+
 
 $(function(){
+  //============Inicialización===============
+  inicializarSlider();
+  playVideoOnScroll();
+  //============Cargado de listas============
+  cargarDropdown($("#selectCiudad"), "ciudad");
+  cargarDropdown($("#selectTipo"), "tipo");
+  //=========================================
 
+  //Al realizar una búsqueda personalizada (botón Buscar)
   $('#formulario').submit(function(event){
     event.preventDefault();
 
@@ -69,6 +98,7 @@ $(function(){
     });
   });
 
+//Al realizar una búsqueda completa (botón Mostrar Todos)
   $('#mostrarTodos').on('click', function(event){
     $.ajax({
       url:"./buscador.php",
