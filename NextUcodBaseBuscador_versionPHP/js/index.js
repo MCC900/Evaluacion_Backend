@@ -72,6 +72,32 @@ function cargarDropdown(select, tipoAListar){
   })
 }
 
+/*---Esta función muestra los registros inmuebles enviados por parámetros
+en la página en la sección correspondiente---*/
+function mostrarRegistros(registros){
+  for(var i=0; i<registros.length; i++){
+    var reg = registros[i];
+
+    var item = $("<div>");
+    item.addClass("itemMostrado");
+    item.addClass("card");
+
+    var itemImg = $("<img>");
+    itemImg.attr("src", "./img/home.jpg");
+    item.append(itemImg);
+
+    var contenido = $("<div>");
+    contenido.addClass("card-content");
+    contenido.append(`<b>Dirección: </b>${reg.Direccion}<br>`);
+    contenido.append(`<b>Ciudad</b>: ${reg.Ciudad}<br>`);
+    contenido.append(`<b>Teléfono: </b>${reg.Telefono}<br>`);
+    contenido.append(`<b>Tipo: </b>${reg.Tipo}<br>`);
+    contenido.append(`<b>Precio: </b><span class="precioTexto">${reg.Precio}</span><br>`)
+    item.append(contenido);
+
+    $("#mostrarTodos").before(item);
+  }
+}
 
 $(function(){
   //============Inicialización===============
@@ -106,9 +132,13 @@ $(function(){
       dataType:"json",
       data:{
         busquedaPersonalizada:"false"
+      },
+      error:function(data){
+        console.log(data);
       }
     }).done(function(data){
-      alert(data.mensaje);
+      console.log(data.mensaje);
+      mostrarRegistros(data.resultadosBusqueda);
     });
   });
 
