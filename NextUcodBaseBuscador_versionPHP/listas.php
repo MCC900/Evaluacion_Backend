@@ -32,8 +32,10 @@
   $respuesta;
 
   if($tipoAListar == "ciudad"){
+    //Devolvemos la lista de ciudades (sin repetidos)
     $respuesta["listaElementos"] = encontrarValoresAtributo($data, "Ciudad");
   } elseif ($tipoAListar == "tipo"){
+    //Devolvemos la lista de tipos (sin repetidos)
     $respuesta["listaElementos"] = encontrarValoresAtributo($data, "Tipo");
   }
 

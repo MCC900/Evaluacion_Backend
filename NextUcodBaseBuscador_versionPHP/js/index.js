@@ -59,6 +59,10 @@ function cargarDropdown(select, tipoAListar){
     dataType:"json",
     data:{
       tipoAListar:tipoAListar
+    },
+    error:function(data){
+      console.log(data);
+      alert("Se ha producido un error al enviar la petición.");
     }
   }).done(function(data){
     for(var i=0; i < data.listaElementos.length; i++){
@@ -75,34 +79,46 @@ function cargarDropdown(select, tipoAListar){
 /*---Esta función muestra los registros inmuebles enviados por parámetros
 en la página en la sección correspondiente---*/
 function mostrarRegistros(registros){
+
+  //Limpiamos los registros anteriores
+  $("#resultados").html("");
+
   for(var i=0; i<registros.length; i++){
     var reg = registros[i];
 
-    var item = $("<div>");
-    item.addClass("itemMostrado");
-    item.addClass("card");
+    //Creamos el card que mostrará el registro (Una image card horizontal)
+    var card = $('<div class="itemMostrado card horizontal">');
 
-    var itemImg = $("<img>");
-    itemImg.attr("src", "./img/home.jpg");
-    item.append(itemImg);
+    var cardImage = $('<div class="card-image">');
+    var imagen = $('<img src="./img/home.jpg">');
+    cardImage.append(imagen);
+    card.append(cardImage);
 
-    var contenido = $("<div>");
-    contenido.addClass("card-content");
-    contenido.append(`<b>Dirección: </b>${reg.Direccion}<br>`);
-    contenido.append(`<b>Ciudad</b>: ${reg.Ciudad}<br>`);
-    contenido.append(`<b>Teléfono: </b>${reg.Telefono}<br>`);
-    contenido.append(`<b>Tipo: </b>${reg.Tipo}<br>`);
-    contenido.append(`<b>Precio: </b><span class="precioTexto">${reg.Precio}</span><br>`)
-    item.append(contenido);
+    var cardStacked = $('<div class="card-stacked">');
+    card.append(cardStacked);
 
-    $("#mostrarTodos").before(item);
+    //Colocamos los datos del registro en el card-content
+    var cardContent = $('<div class="card-content">');
+    cardContent.append(`<b>Dirección: </b>${reg.Direccion}<br>`);
+    cardContent.append(`<b>Ciudad</b>: ${reg.Ciudad}<br>`);
+    cardContent.append(`<b>Teléfono: </b>${reg.Telefono}<br>`);
+    cardContent.append(`<b>Tipo: </b>${reg.Tipo}<br>`);
+    cardContent.append(`<b>Precio: </b><span class="precioTexto">${reg.Precio}</span><br>`)
+    cardStacked.append(cardContent);
+
+    var cardAction = $('<div class="card-action">');
+    cardAction.html("<a href=''>Ver más</a>");
+    cardStacked.append(cardAction);
+
+    //Agregamos el card a la lista de resultados
+    $("#resultados").append(card);
   }
 }
 
 $(function(){
   //============Inicialización===============
   inicializarSlider();
-  playVideoOnScroll();
+  playVideoOnScroll(); //??? El video no venía con el descargable ???
   //============Cargado de listas============
   cargarDropdown($("#selectCiudad"), "ciudad");
   cargarDropdown($("#selectTipo"), "tipo");
@@ -112,20 +128,35 @@ $(function(){
   $('#formulario').submit(function(event){
     event.preventDefault();
 
+    //Capturamos los datos de los distintos filtros
+    var ciudad = $("#selectCiudad option:selected").val();
+    var tipo = $("#selectTipo option:selected").val();
+    var rangoPrecio = $("#rangoPrecio").val();
+
+    //Hacemos la petición
     $.ajax({
       url:"./buscador.php",
       type:"GET",
       dataType:"json",
       data:{
-        busquedaPersonalizada:"true"
+        busquedaPersonalizada:"true",
+        rangoPrecio:rangoPrecio,
+        tipo:tipo,
+        ciudad:ciudad
+      },
+      error:function(data){
+        console.log(data);
+        alert("Se ha producido un error al enviar la petición.");
       }
     }).done(function(data){
-      alert(data.mensaje);
+      console.log(data.mensaje);
+      mostrarRegistros(data.resultadosBusqueda);
     });
   });
 
 //Al realizar una búsqueda completa (botón Mostrar Todos)
   $('#mostrarTodos').on('click', function(event){
+    //Hacemos la petición
     $.ajax({
       url:"./buscador.php",
       type:"GET",
@@ -135,6 +166,7 @@ $(function(){
       },
       error:function(data){
         console.log(data);
+        alert("Se ha producido un error al enviar la petición.");
       }
     }).done(function(data){
       console.log(data.mensaje);
